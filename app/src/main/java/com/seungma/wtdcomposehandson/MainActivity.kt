@@ -1,7 +1,5 @@
 package com.seungma.wtdcomposehandson
 
-import android.icu.text.CaseMap
-import android.icu.text.CaseMap.Title
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,16 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,12 +40,38 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun WtdScreen() {
+
+        val defaultList = (1..10).toList()
+        var list by remember { mutableStateOf(defaultList) }
+
+        val add = {
+            list = list.toMutableList().apply {
+                if(list.isNotEmpty()) {
+                        add(list.last() + 1)
+                } else {
+                        add(1)
+                }
+            }
+        }
+
+        val delete = {
+            if(list.isNotEmpty()) {
+                list = list.toMutableList().apply {
+                    removeLast()
+                }
+            }
+        }
+
+        val reset = {
+            list = defaultList
+        }
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
             Title()
-            Behavior()
-            List()
+            Behavior(add = add, delete = delete, reset = reset)
+            List(itemList = list)
         }
     }
 
@@ -66,33 +89,32 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Behavior() {
+    fun Behavior(add: () -> Unit, delete: () -> Unit, reset: () -> Unit) {
         Row {
-            BehaviorItem(text = "추가", backgroundColor = Color(0xFFD9D9D9))
-            BehaviorItem(text = "삭제", backgroundColor = Color(0xFF944B4B))
-            BehaviorItem(text = "초기화", backgroundColor = Color(0xFF84D59F))
+            BehaviorItem(text = "추가", backgroundColor = Color(0xFFD9D9D9), onClick = add)
+            BehaviorItem(text = "삭제", backgroundColor = Color(0xFF944B4B), onClick = delete)
+            BehaviorItem(text = "초기화", backgroundColor = Color(0xFF84D59F), onClick = reset)
         }
     }
 
     @Composable
-    fun BehaviorItem(text: String, backgroundColor: Color) {
+    fun BehaviorItem(text: String, backgroundColor: Color, onClick: () -> Unit) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(100.dp)
                 .background(backgroundColor)
+                .clickable(onClick = onClick)
         ) {
             Text(text = text, fontSize = 28.sp)
         }
     }
 
     @Composable
-    fun List() {
-        val count by remember { mutableStateOf(10) }
-            val itemList = (1..count).toList()
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(itemList) { ListItem(it) }
-            }
+    fun List(itemList: List<Int>) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(itemList) { ListItem(it) }
+        }
     }
 
     @Composable
