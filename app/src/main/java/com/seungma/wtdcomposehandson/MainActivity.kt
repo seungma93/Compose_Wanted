@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,11 @@ class MainActivity : ComponentActivity() {
     fun WtdScreen() {
 
         val defaultList = (1..10).toList()
-        var list by remember { mutableStateOf(defaultList) }
+        var list by remember { mutableStateOf(emptyList<Int>()) }
+        
+        LaunchedEffect(Unit) {
+            list = defaultList
+        }
 
         val add = {
             list = list.toMutableList().apply {
